@@ -4,6 +4,8 @@ local server = require("fortran.server")
 local cmd = require("fortran.commands")
 local prefix = "fortan.nvim: "
 
+M.server = true
+
 M.defaults = {
 	server_opts = {
 		path = "fortls",
