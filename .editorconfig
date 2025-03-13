@@ -1,0 +1,13 @@
+# EditorConfig file. For more info, please see:
+# https://editorconfig.org/
+
+# top-most EditorConfig file
+root = true
+
+[*]
+trim_trailing_whitespace = true
+insert_final_newline = true
+
+[*.lua]
+indent_style = space
+indent_size = 2
