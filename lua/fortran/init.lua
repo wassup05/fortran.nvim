@@ -57,8 +57,6 @@ M.check_requirements = function(opts)
     M.server = false
 	elseif exists(opts.fpm_opts.path) == 0 then
 		vim.notify(prefix .. "package manager " .. opts.fpm_opts.path .. " not found", warn)
-	elseif exists(opts.fpm_opts.fpm_args.compiler_name) == 0 then
-		vim.notify(prefix .. "compiler" .. opts.fpm_opts.args.compiler .. " not found", warn)
 	end
 end
 
