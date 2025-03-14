@@ -50,6 +50,7 @@ return {
   },
 
   fpm_opts = {
+    terminal = true,
     path = "fpm",
       args = {
       -- fpm args go here exactly as you would pass them to fpm
