@@ -13,6 +13,10 @@ A lua plugin for making it easy to work with [Fortran](https://fortran-lang.org/
 - optionally also sets up an autocmd to format the document on save
 - Sets the `filetype` of `fypp` files as appropriately, enabling the use of syntax highlighting and language server on such files.
 
+### Requirements
+- You need to install `fortls`, `fprettify`, `fpm` from your respective package manager.
+- load this before the plugin https://github.com/neovim/nvim-lspconfig
+
 ### Installation
 
 ### [lazy.nvim](https://github.com/folke/lazy.nvim)
