@@ -1,4 +1,5 @@
 local M = {}
+local api = vim.api
 local create_uc = vim.api.nvim_create_user_command
 
 local function create_cmd_string(path, subcommand)
@@ -20,6 +21,10 @@ local function create_cmd_string(path, subcommand)
     end
   end
 
+  if M._fpm_term and subcommand ~= "format" then
+    return path .. " " .. subcommand .. subcommand_opts_string
+  end
+
   return "!" .. path .. " " .. subcommand .. subcommand_opts_string
 end
 
@@ -28,6 +33,10 @@ local function create_cmd(name, opts)
   local cmd_name = string.upper(string.sub(name, 1, 1)) .. string.sub(name, 2)
   create_uc("Fpm" .. cmd_name, function(info)
     local cmd_string = create_cmd_string(M._fpm_name, name) .. " " .. info.args
+    if M._fpm_term and name ~= "format" then
+      api.nvim_command("terminal ".. cmd_string)
+      return
+    end
     local output = vim.fn.execute(cmd_string, "silent!")
     if name ~= "format" then
       print(output)
@@ -38,6 +47,7 @@ end
 M._setup_args = function(opts)
   M._fpm_args = opts.fpm_opts.args
   M._fpm_name = opts.fpm_opts.path
+  M._fpm_term = opts.fpm_opts.terminal
   M._format_args = opts.formatter_opts.args
   M._formatter_name = opts.formatter_opts.path
 end

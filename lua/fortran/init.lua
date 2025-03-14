@@ -23,6 +23,7 @@ M.defaults = {
   },
 
   fpm_opts = {
+    terminal = true,
     path = "fpm",
     args = {},
   },
