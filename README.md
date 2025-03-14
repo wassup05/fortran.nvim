@@ -46,7 +46,6 @@ return {
     },
     filetypes = { "fortran" },
     settings = {},
-    single_file_support = true,
   },
 
   fpm_opts = {
