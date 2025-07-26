@@ -5,7 +5,7 @@ local create_uc = vim.api.nvim_create_user_command
 local function create_cmd_string(path, subcommand)
   local subcommand_opts_string = ""
 
-  for _, v in ipairs(M._fpm_args) do
+  for _, v in ipairs(M._opts.fpm_opts.args) do
     subcommand_opts_string = subcommand_opts_string .. " " .. v .. " "
   end
 
@@ -14,26 +14,26 @@ local function create_cmd_string(path, subcommand)
   end
 
   if subcommand == "format" then
-    path = M._formatter_name
-    subcommand = "%"
-    for _, v in ipairs(M._format_args) do
+    local formatter_path = M._opts.formatter_opts.path
+    subcommand_opts_string = formatter_path .. " %"
+    for _, v in ipairs(M._opts.formatter_opts.args) do
       subcommand_opts_string = subcommand_opts_string .. " " .. v .. " "
     end
   end
 
-  if M._fpm_term and subcommand ~= "format" then
+  if M._opts.fpm_opts.terminal and subcommand ~= "format" then
     return path .. " " .. subcommand .. subcommand_opts_string
   end
 
-  return "!" .. path .. " " .. subcommand .. subcommand_opts_string
+  return "!" .. subcommand_opts_string
 end
 
 local function create_cmd(name, opts)
   -- capitalize first letter
   local cmd_name = string.upper(string.sub(name, 1, 1)) .. string.sub(name, 2)
   create_uc("Fpm" .. cmd_name, function(info)
-    local cmd_string = create_cmd_string(M._fpm_name, name) .. " " .. info.args
-    if M._fpm_term and name ~= "format" then
+    local cmd_string = create_cmd_string(M._opts.fpm_opts.path, name) .. " " .. info.args
+    if M._opts.fpm_opts.terminal and name ~= "format" then
       api.nvim_command("terminal ".. cmd_string)
       return
     end
@@ -44,31 +44,17 @@ local function create_cmd(name, opts)
   end, opts)
 end
 
-M._setup_args = function(opts)
-  M._fpm_args = opts.fpm_opts.args
-  M._fpm_name = opts.fpm_opts.path
-  M._fpm_term = opts.fpm_opts.terminal
-  M._format_args = opts.formatter_opts.args
-  M._formatter_name = opts.formatter_opts.path
-end
-
 M.setup_format_autocmd = function(opts)
-  if not opts.format_on_save then
-    return
-  end
-
   local args = {
     opts.path,
     "placeholder",
   }
 
-  for i, v in ipairs(opts.args) do
-    args[i + 2] = v
-  end
+  vim.list_extend(args, opts.args)
 
   vim.api.nvim_create_autocmd({ "BufWritePre" }, {
     pattern = { "*.f90", "*.f95" },
-    group = vim.api.nvim_create_augroup("fortran-save", { clear = true }),
+    group = vim.api.nvim_create_augroup("fortran-save-format", { clear = true }),
 
     callback = function(event)
       local bufid = event.buf
@@ -79,7 +65,7 @@ M.setup_format_autocmd = function(opts)
         text = true,
       }, function(out)
         if out.code ~= 0 then
-          print("formatting failed", out.stdout)
+          print("Formatting Failed", out.stdout)
         else
           vim.schedule(function()
             vim.cmd("e")
@@ -91,7 +77,7 @@ M.setup_format_autocmd = function(opts)
 end
 
 M.setup_commands = function(opts)
-  M._setup_args(opts)
+  M._opts = opts
 
   create_cmd("run", { nargs = "*" })
   create_cmd("build", { nargs = "*" })

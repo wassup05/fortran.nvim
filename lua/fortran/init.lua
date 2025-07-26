@@ -4,10 +4,9 @@ local server = require("fortran.server")
 local cmd = require("fortran.commands")
 local prefix = "fortan.nvim: "
 
-M.server = true
-
 M.defaults = {
   server_opts = {
+    enabled = true,
     path = "fortls",
     args = {
       "--notify_init",
@@ -22,12 +21,14 @@ M.defaults = {
   },
 
   fpm_opts = {
-    terminal = true,
+    enabled = true,
     path = "fpm",
     args = {},
+    terminal = true,
   },
 
   formatter_opts = {
+    enabled = true,
     path = "fprettify",
     format_on_save = true,
     args = {},
@@ -38,9 +39,12 @@ M.setup = function(opts)
   M.handle_opts(opts)
   M.check_requirements(M._opts)
   cmd.setup_commands(M._opts)
-  cmd.setup_format_autocmd(M._opts.formatter_opts)
 
-  if M.server then
+  if M._opts.formatter_opts.format_on_save then
+    cmd.setup_format_autocmd(M._opts.formatter_opts)
+  end
+
+  if M._opts.server_opts.enabled then
     server.start_server(M._opts)
   end
 end
@@ -54,11 +58,19 @@ M.check_requirements = function(opts)
   local exists = vim.fn.executable
   local warn = vim.log.levels.WARN
 
-  if exists(opts.server_opts.path) == 0 then
-    vim.notify(prefix .. "server " .. opts.server_opts.path .. " not found", warn)
-    M.server = false
-  elseif exists(opts.fpm_opts.path) == 0 then
-    vim.notify(prefix .. "package manager " .. opts.fpm_opts.path .. " not found", warn)
+  if opts.server_opts.enabled and (exists(opts.server_opts.path) == 0) then
+    vim.notify(prefix .. "Server " .. opts.server_opts.path .. " not found", warn)
+    opts.server_opts.enabled = false
+  end
+
+  if opts.fpm_opts.enabled and (exists(opts.fpm_opts.path) == 0) then
+    vim.notify(prefix .. "Package Manager " .. opts.fpm_opts.path .. " not found", warn)
+    opts.fpm_opts.enabled = false
+  end
+
+  if opts.formatter_opts.enabled and (exists(opts.formatter_opts.path) == 0) then
+    vim.notify(prefix .. "Formatter " .. opts.fpm_opts.path .. " not found", warn)
+    opts.formatter_opts.enabled = false
   end
 end
 
