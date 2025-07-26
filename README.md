@@ -39,6 +39,7 @@ return {
 -- default config
 {
   server_opts = {
+    enabled = true,
     path = "fortls",
     args = {
       "--notify_init",
@@ -53,14 +54,16 @@ return {
   },
 
   fpm_opts = {
-    terminal = true,
+    enabled = true,
     path = "fpm",
       args = {
       -- fpm args go here exactly as you would pass them to fpm
     },
+    terminal = true,
   },
 
   formatter_opts = {
+    enabled = true,
     path = "fprettify",
     format_on_save = true,
     args = {
